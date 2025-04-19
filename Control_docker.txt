@@ -29,6 +29,7 @@ docker run -it ubuntu:20.04 /bin/bash  # Start container (interactive)
 docker ps                              # List running containers
 docker ps -a                           # List all containers
 docker stop <container-id/name>                       # Stop container
+docker-compose down                                   # stop container
 docker start <container-id/name>                      # Start container
 docker rm <container-id/name>                         # Remove container
 docker exec -it <container-id/name> /bin/bash         # Access container shell
