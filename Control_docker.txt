@@ -1,0 +1,50 @@
+# Check Docker version
+docker --version
+
+# Display system-wide information
+docker info
+
+# Get help on any command
+docker <command> --help
+
+
+======= Image Management ======
+
+# List all images
+docker images
+
+# Search for an image on Docker Hub
+docker search <image-name>
+
+# Download an image
+docker pull <image-name>:<tag>
+
+# Remove an image
+docker rmi <image-name>:<tag>
+
+# Build an image from Dockerfile
+docker build -t <image-name>:<tag> .
+
+# Tag an image
+docker tag <source-image>:<tag> <new-image>:<tag>
+
+# Push an image to registry
+docker push <username>/<image-name>:<tag>
+
+# Remove dangling images
+docker image prune
+
+
+============ Container Management ===========
+
+# Check running containers:
+docker-compose ps
+
+# Build and start the containers:
+docker-compose up -d
+
+# Stop the containers
+docker-compose down
+
+# Rebuild after changes
+docker-compose up -d --build
