@@ -1,50 +1,161 @@
-# Check Docker version
-docker --version
+Docker is a platform for building, running, and managing containers—lightweight, 
+portable units of software.
 
-# Display system-wide information
-docker info
-
-# Get help on any command
-docker <command> --help
-
+docker --version          # Check Docker version
+docker info               # Docker system info
+docker <cmd> --help       # Help for a specific command
 
 ======= Image Management ======
 
-# List all images
-docker images
-
-# Search for an image on Docker Hub
-docker search <image-name>
-
-# Download an image
-docker pull <image-name>:<tag>
-
-# Remove an image
-docker rmi <image-name>:<tag>
-
-# Build an image from Dockerfile
-docker build -t <image-name>:<tag> .
-
-# Tag an image
-docker tag <source-image>:<tag> <new-image>:<tag>
-
-# Push an image to registry
-docker push <username>/<image-name>:<tag>
-
-# Remove dangling images
-docker image prune
-
+docker images                                      # List images
+docker search ubuntu                               # Search Docker Hub
+docker pull ubuntu:20.04                           # Pull image
+docker rmi ubuntu:20.04                            # Remove image
+docker build -t <image-name>:<tag> .               # Build image from Dockerfile
+       example: docker build -t docker-myapp-com:latest .
+       here <image-name> (your choice) and <tag> (you choice) default tag 'latest'
+docker tag <source-image>:<tag> <new-image>:<tag>  # Tag an image
+docker push <username>/<image-name>:<tag>          # Push an image to registry
+docker image prune                                 # Remove dangling images
 
 ============ Container Management ===========
 
-# Check running containers:
-docker-compose ps
+// docker-compose.yml   ==>  include containers information.
+docker-compose up -d --build                    # After changes to Dockerfile or code: Start container
+Build images before starting containers (--build)
+Run containers in detached mode (-d)
 
-# Build and start the containers:
+docker run -it ubuntu:20.04 /bin/bash  # Start container (interactive)
+docker ps                              # List running containers
+docker ps -a                           # List all containers
+docker stop <container-id/name>                       # Stop container
+docker start <container-id/name>                      # Start container
+docker rm <container-id/name>                         # Remove container
+docker exec -it <container-id/name> /bin/bash         # Access container shell
+docker logs <container-id/name>                       # View logs
+
+
+============= Network Management =============
+
+docker network ls                                              # List networks
+docker network create <network-name>                           # Create network
+docker network inspect <network-name>                          # Inspect a network
+docker network connect <network-name> <container-id/name>      # Connect container to network
+docker network disconnect <network-name> <container-id/name>   # Disconnect container from network
+docker network rm <network-name>                               # Remove a network
+
+============ Volume(storage) Management ============
+
+docker volume ls                       # List volumes
+docker volume create <volume-name>     # Create volume
+docker volume inspect <volume-name>    # Inspect a volume
+docker volume rm <volume-name>         # Remove a volume
+docker volume prune                    # Remove unused volumes
+
+------------- command completed --------------------
+
+Info:
+========= Dockerfile Basics ============
+
+FROM python:3.9-slim
+WORKDIR /app
+COPY . /app
+RUN pip install -r requirements.txt
+EXPOSE 80
+CMD ["python", "app.py"]
+
+Instructions:-
+FROM: Base image
+WORKDIR: Working directory
+COPY: Copy files
+RUN: Run commands
+CMD: Default command
+EXPOSE: Expose port
+
+
+============== Docker Compose =============
+
+# docker-compose.yml
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "4000:80"
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+
 docker-compose up -d
-
-# Stop the containers
+docker-compose logs
 docker-compose down
+docker-compose up --scale web=3 -d
 
-# Rebuild after changes
-docker-compose up -d --build
+
+=========== Working with Images ============
+
+docker build -t myapp:1.0 .
+docker tag myapp:1.0 user/myapp:1.0
+docker push user/myapp:1.0
+docker inspect myapp:1.0
+docker image prune                   # Remove dangling images
+
+
+===============  Working with Containers ============
+
+docker run -d -p 4000:80 myapp:1.0
+docker run -e "ENV=prod" myapp:1.0
+docker run -v /host:/container myapp:1.0
+docker run --network=my-net myapp:1.0
+docker run -m 512m --cpus=1.5 myapp:1.0
+docker stats                         # Show container resource usage
+
+# Run a container
+docker run [options] <image-name>:<tag>
+
+# Common run options:
+-d                  # Run in detached mode
+-it                 # Interactive terminal
+-p <host>:<container> # Port mapping
+-v <host>:<container> # Volume mounting
+-e VAR=value        # Environment variable
+--name <name>       # Assign container name
+--network <network> # Connect to network
+
+
+======== Database Containers ==========
+
+docker run --name mysql-db -e MYSQL_ROOT_PASSWORD=pw -d mysql:8.0
+docker run --name mongo-db -d mongo:5.0
+docker run --name postgres-db -e POSTGRES_PASSWORD=pw -d postgres:13
+
+************* Project Deployment ****************
+
+1. Create Dockerfile
+2. Create docker-compose.yml
+3. Build & run: docker-compose up -d
+4. Push image:
+   docker login
+   docker tag myapp user/myapp:1.0
+   docker push user/myapp:1.0
+
+
+////////// Best Practices //////////
+
+Use .dockerignore
+Use minimal base images
+Avoid latest tag
+Leverage multi-stage builds
+Add health checks
+Set CPU/memory limits
+Use specific image versions
+
+
+/*/*/*/*/*/*/*/*   Cleanups  /*/*/*/*/*/*/*/*
+
+docker container prune         # Remove stopped containers
+docker image prune             # Remove dangling images
+docker system prune            # Clean up unused resources
